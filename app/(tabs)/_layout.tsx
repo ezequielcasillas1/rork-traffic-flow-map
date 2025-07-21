@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Code } from "lucide-react-native";
+import { Map, Menu } from "lucide-react-native";
 import React from "react";
 
 import Colors from "@/constants/colors";
@@ -15,8 +15,15 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Tab One",
-          tabBarIcon: ({ color }) => <Code color={color} />,
+          title: "Traffic Map",
+          tabBarIcon: ({ color }) => <Map color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Settings",
+          tabBarIcon: ({ color }) => <Menu color={color} />,
         }}
       />
     </Tabs>

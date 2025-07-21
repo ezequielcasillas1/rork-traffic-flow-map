@@ -8,4 +8,10 @@ export default {
     tabIconDefault: "#ccc",
     tabIconSelected: tintColorLight,
   },
+  traffic: {
+    light: "#4CAF50",    // Green
+    medium: "#FF9800",   // Orange
+    heavy: "#F44336",    // Red
+    closed: "#757575",   // Gray
+  }
 };
