@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, View, Text, Platform } from "react-native";
-import { Slider } from "@react-native-community/slider";
+import Slider from "@react-native-community/slider";
 
 type AlertRadiusSliderProps = {
   value: number;
@@ -36,8 +36,6 @@ export function AlertRadiusSlider({ value, onValueChange, disabled }: AlertRadiu
         onValueChange={onValueChange}
         minimumTrackTintColor="#2f95dc"
         maximumTrackTintColor="#d3d3d3"
-        thumbStyle={styles.thumb}
-        trackStyle={styles.track}
         disabled={disabled}
         testID="alert-radius-slider"
       />
@@ -67,15 +65,6 @@ const styles = StyleSheet.create({
   slider: {
     width: "100%",
     height: 40,
-  },
-  thumb: {
-    backgroundColor: "#2f95dc",
-    width: 20,
-    height: 20,
-  },
-  track: {
-    height: 4,
-    borderRadius: 2,
   },
   webContainer: {
     padding: 15,
