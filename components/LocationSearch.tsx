@@ -23,6 +23,11 @@ const mockSearchResults = [
   { id: "3", name: "Chicago", lat: 41.8781, lng: -87.6298 },
   { id: "4", name: "San Francisco", lat: 37.7749, lng: -122.4194 },
   { id: "5", name: "Miami", lat: 25.7617, lng: -80.1918 },
+  { id: "6", name: "Seattle", lat: 47.6062, lng: -122.3321 },
+  { id: "7", name: "Boston", lat: 42.3601, lng: -71.0589 },
+  { id: "8", name: "Denver", lat: 39.7392, lng: -104.9903 },
+  { id: "9", name: "Austin", lat: 30.2672, lng: -97.7431 },
+  { id: "10", name: "Portland", lat: 45.5152, lng: -122.6784 },
 ];
 
 export function LocationSearch({ onSelectLocation }: LocationSearchProps) {
@@ -41,6 +46,8 @@ export function LocationSearch({ onSelectLocation }: LocationSearchProps) {
     
     if (text.length > 2) {
       setIsSearching(true);
+      setShowResults(true);
+      
       // Simulate API call delay
       setTimeout(() => {
         const filteredResults = mockSearchResults.filter((item) =>
@@ -48,11 +55,11 @@ export function LocationSearch({ onSelectLocation }: LocationSearchProps) {
         );
         setSearchResults(filteredResults);
         setIsSearching(false);
-        setShowResults(true);
-      }, 500);
+      }, 300);
     } else {
       setSearchResults([]);
       setShowResults(false);
+      setIsSearching(false);
     }
   };
 
@@ -62,15 +69,28 @@ export function LocationSearch({ onSelectLocation }: LocationSearchProps) {
     lat: number;
     lng: number;
   }) => {
-    onSelectLocation({ lat: location.lat, lng: location.lng, name: location.name });
+    console.log('Location selected:', location);
+    
+    // Call the parent callback with the location data
+    onSelectLocation({ 
+      lat: location.lat, 
+      lng: location.lng, 
+      name: location.name 
+    });
+    
+    // Update the search query to show the selected location
     setSearchQuery(location.name);
+    
+    // Hide the results
     setShowResults(false);
+    setSearchResults([]);
   };
 
   const clearSearch = () => {
     setSearchQuery("");
     setSearchResults([]);
     setShowResults(false);
+    setIsSearching(false);
   };
 
   // Don't render search on web
@@ -87,7 +107,11 @@ export function LocationSearch({ onSelectLocation }: LocationSearchProps) {
           placeholder="Search location..."
           value={searchQuery}
           onChangeText={handleSearch}
-          onFocus={() => searchQuery.length > 2 && setShowResults(true)}
+          onFocus={() => {
+            if (searchQuery.length > 2) {
+              setShowResults(true);
+            }
+          }}
           testID="location-search-input"
         />
         {searchQuery.length > 0 && (
@@ -100,10 +124,11 @@ export function LocationSearch({ onSelectLocation }: LocationSearchProps) {
       {isSearching && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="small" color="#2f95dc" />
+          <Text style={styles.loadingText}>Searching...</Text>
         </View>
       )}
 
-      {showResults && searchResults.length > 0 && (
+      {showResults && !isSearching && searchResults.length > 0 && (
         <View style={styles.resultsContainer}>
           <FlatList
             data={searchResults}
@@ -117,13 +142,14 @@ export function LocationSearch({ onSelectLocation }: LocationSearchProps) {
                 <Text style={styles.resultText}>{item.name}</Text>
               </TouchableOpacity>
             )}
+            keyboardShouldPersistTaps="handled"
           />
         </View>
       )}
 
-      {showResults && searchResults.length === 0 && searchQuery.length > 2 && (
+      {showResults && !isSearching && searchResults.length === 0 && searchQuery.length > 2 && (
         <View style={styles.resultsContainer}>
-          <Text style={styles.noResultsText}>No locations found</Text>
+          <Text style={styles.noResultsText}>No locations found for "{searchQuery}"</Text>
         </View>
       )}
     </View>
@@ -161,7 +187,7 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     backgroundColor: "white",
-    padding: 20,
+    padding: 15,
     alignItems: "center",
     borderBottomLeftRadius: 8,
     borderBottomRightRadius: 8,
@@ -171,6 +197,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 3,
+  },
+  loadingText: {
+    marginTop: 8,
+    fontSize: 14,
+    color: "#666",
   },
   resultsContainer: {
     backgroundColor: "white",
@@ -185,7 +216,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   resultItem: {
-    paddingVertical: 12,
+    paddingVertical: 15,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
@@ -198,5 +229,6 @@ const styles = StyleSheet.create({
     padding: 16,
     textAlign: "center",
     color: "#666",
+    fontSize: 14,
   },
 });

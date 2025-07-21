@@ -26,6 +26,12 @@ type Region = {
   longitudeDelta: number;
 };
 
+type SearchedLocation = {
+  latitude: number;
+  longitude: number;
+  name?: string;
+};
+
 export default function TrafficMapScreen() {
   const mapRef = useRef<any>(null);
   const [region, setRegion] = useState<Region>({
@@ -38,6 +44,7 @@ export default function TrafficMapScreen() {
     latitude: number;
     longitude: number;
   } | null>(null);
+  const [searchedLocation, setSearchedLocation] = useState<SearchedLocation | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const { showTraffic, setShowTraffic } = useMapSettings();
 
@@ -82,6 +89,8 @@ export default function TrafficMapScreen() {
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       });
+      // Clear searched location when going to user location
+      setSearchedLocation(null);
     } else {
       requestLocationPermission();
     }
@@ -97,14 +106,29 @@ export default function TrafficMapScreen() {
       return;
     }
     
+    console.log('Searching for location:', result);
+    
+    const newRegion = {
+      latitude: result.lat,
+      longitude: result.lng,
+      latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421,
+    };
+    
+    // Set the searched location marker
+    setSearchedLocation({
+      latitude: result.lat,
+      longitude: result.lng,
+      name: result.name,
+    });
+    
+    // Animate to the new location
     if (mapRef.current) {
-      mapRef.current.animateToRegion({
-        latitude: result.lat,
-        longitude: result.lng,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      });
+      mapRef.current.animateToRegion(newRegion, 1000);
     }
+    
+    // Update region state
+    setRegion(newRegion);
   };
 
   // Web fallback component
@@ -151,6 +175,17 @@ export default function TrafficMapScreen() {
             }}
             title="You are here"
             pinColor="#2f95dc"
+          />
+        )}
+        
+        {searchedLocation && (
+          <Marker
+            coordinate={{
+              latitude: searchedLocation.latitude,
+              longitude: searchedLocation.longitude,
+            }}
+            title={searchedLocation.name || "Searched Location"}
+            pinColor="#FF6B6B"
           />
         )}
       </MapView>
