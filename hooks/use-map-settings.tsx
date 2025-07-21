@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Platform } from "react-native";
 import createContextHook from "@nkzw/create-context-hook";
 
@@ -16,12 +16,18 @@ export const [MapSettingsProvider, useMapSettings] = createContextHook(() => {
   useEffect(() => {
     const loadSettings = async () => {
       try {
+        // Skip AsyncStorage on web to avoid errors
+        if (Platform.OS === 'web') {
+          setIsLoading(false);
+          return;
+        }
+
         const storedSettings = await AsyncStorage.getItem("mapSettings");
         if (storedSettings) {
           const settings = JSON.parse(storedSettings);
-          setShowTraffic(settings.showTraffic);
-          setShowLegend(settings.showLegend);
-          setMapType(settings.mapType);
+          setShowTraffic(settings.showTraffic ?? true);
+          setShowLegend(settings.showLegend ?? true);
+          setMapType(settings.mapType ?? "standard");
         }
       } catch (error) {
         console.error("Failed to load map settings:", error);
@@ -35,7 +41,7 @@ export const [MapSettingsProvider, useMapSettings] = createContextHook(() => {
 
   // Save settings to AsyncStorage whenever they change
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && Platform.OS !== 'web') {
       const saveSettings = async () => {
         try {
           const settings = {
@@ -63,6 +69,3 @@ export const [MapSettingsProvider, useMapSettings] = createContextHook(() => {
     isLoading,
   };
 });
-
-// Fix missing import
-import { useState } from "react";

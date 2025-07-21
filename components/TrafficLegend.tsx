@@ -1,11 +1,12 @@
 import React from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, Platform } from "react-native";
 import { useMapSettings } from "@/hooks/use-map-settings";
 
 export default function TrafficLegend() {
   const { showLegend } = useMapSettings();
   
-  if (!showLegend) return null;
+  // Don't render legend on web
+  if (Platform.OS === 'web' || !showLegend) return null;
   
   return (
     <View style={styles.legendContainer}>

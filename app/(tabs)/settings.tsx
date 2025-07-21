@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Text, Switch, ScrollView } from "react-native";
+import { StyleSheet, View, Text, Switch, ScrollView, TouchableOpacity, Platform } from "react-native";
 import { useMapSettings } from "@/hooks/use-map-settings";
 
 export default function SettingsScreen() {
@@ -25,6 +25,7 @@ export default function SettingsScreen() {
             trackColor={{ false: "#767577", true: "#81b0ff" }}
             thumbColor={showTraffic ? "#2f95dc" : "#f4f3f4"}
             testID="traffic-toggle"
+            disabled={Platform.OS === 'web'}
           />
         </View>
         
@@ -36,6 +37,7 @@ export default function SettingsScreen() {
             trackColor={{ false: "#767577", true: "#81b0ff" }}
             thumbColor={showLegend ? "#2f95dc" : "#f4f3f4"}
             testID="legend-toggle"
+            disabled={Platform.OS === 'web'}
           />
         </View>
         
@@ -48,14 +50,17 @@ export default function SettingsScreen() {
                 style={[
                   styles.mapTypeButton,
                   mapType === type && styles.mapTypeButtonActive,
+                  Platform.OS === 'web' && styles.mapTypeButtonDisabled,
                 ]}
-                onPress={() => setMapType(type)}
+                onPress={() => Platform.OS !== 'web' && setMapType(type)}
                 testID={`map-type-${type}`}
+                disabled={Platform.OS === 'web'}
               >
                 <Text
                   style={[
                     styles.mapTypeText,
                     mapType === type && styles.mapTypeTextActive,
+                    Platform.OS === 'web' && styles.mapTypeTextDisabled,
                   ]}
                 >
                   {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -64,6 +69,14 @@ export default function SettingsScreen() {
             ))}
           </View>
         </View>
+
+        {Platform.OS === 'web' && (
+          <View style={styles.webNotice}>
+            <Text style={styles.webNoticeText}>
+              Map settings are only available on mobile devices.
+            </Text>
+          </View>
+        )}
       </View>
       
       <View style={styles.section}>
@@ -90,6 +103,16 @@ export default function SettingsScreen() {
             <Text style={styles.trafficText}>Heavy Traffic</Text>
           </View>
         </View>
+
+        {Platform.OS === 'web' && (
+          <View style={styles.webInfo}>
+            <Text style={styles.webInfoTitle}>Web Version Limitations:</Text>
+            <Text style={styles.webInfoText}>• No real-time map display</Text>
+            <Text style={styles.webInfoText}>• No GPS location services</Text>
+            <Text style={styles.webInfoText}>• No traffic data visualization</Text>
+            <Text style={styles.webInfoText}>• Limited search functionality</Text>
+          </View>
+        )}
       </View>
     </ScrollView>
   );
@@ -143,12 +166,31 @@ const styles = StyleSheet.create({
   mapTypeButtonActive: {
     backgroundColor: "#2f95dc",
   },
+  mapTypeButtonDisabled: {
+    backgroundColor: "#e0e0e0",
+    opacity: 0.6,
+  },
   mapTypeText: {
     fontSize: 14,
     color: "#555",
   },
   mapTypeTextActive: {
     color: "white",
+  },
+  mapTypeTextDisabled: {
+    color: "#999",
+  },
+  webNotice: {
+    backgroundColor: "#fff3cd",
+    padding: 12,
+    borderRadius: 6,
+    marginTop: 10,
+    borderLeftWidth: 4,
+    borderLeftColor: "#ffc107",
+  },
+  webNoticeText: {
+    color: "#856404",
+    fontSize: 14,
   },
   aboutText: {
     fontSize: 16,
@@ -187,5 +229,24 @@ const styles = StyleSheet.create({
   trafficText: {
     fontSize: 14,
     color: "#555",
+  },
+  webInfo: {
+    backgroundColor: "#e3f2fd",
+    padding: 12,
+    borderRadius: 6,
+    marginTop: 15,
+    borderLeftWidth: 4,
+    borderLeftColor: "#2196f3",
+  },
+  webInfoTitle: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#1565c0",
+    marginBottom: 8,
+  },
+  webInfoText: {
+    fontSize: 13,
+    color: "#1976d2",
+    marginBottom: 4,
   },
 });

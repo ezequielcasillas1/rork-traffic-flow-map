@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Platform } from "react-native";
-import MapView, { PROVIDER_GOOGLE, Marker, Region } from "react-native-maps";
 import * as Location from "expo-location";
 
 import { useMapSettings } from "@/hooks/use-map-settings";
@@ -8,8 +7,27 @@ import TrafficLegend from "@/components/TrafficLegend";
 import MapControls from "@/components/MapControls";
 import { LocationSearch } from "@/components/LocationSearch";
 
+// Conditionally import MapView only on native platforms
+let MapView: any = null;
+let Marker: any = null;
+let PROVIDER_GOOGLE: any = null;
+
+if (Platform.OS !== 'web') {
+  const MapModule = require('react-native-maps');
+  MapView = MapModule.default;
+  Marker = MapModule.Marker;
+  PROVIDER_GOOGLE = MapModule.PROVIDER_GOOGLE;
+}
+
+type Region = {
+  latitude: number;
+  longitude: number;
+  latitudeDelta: number;
+  longitudeDelta: number;
+};
+
 export default function TrafficMapScreen() {
-  const mapRef = useRef<MapView | null>(null);
+  const mapRef = useRef<any>(null);
   const [region, setRegion] = useState<Region>({
     latitude: 37.78825,
     longitude: -122.4324,
@@ -47,10 +65,17 @@ export default function TrafficMapScreen() {
   }, []);
 
   useEffect(() => {
-    requestLocationPermission();
+    if (Platform.OS !== 'web') {
+      requestLocationPermission();
+    }
   }, [requestLocationPermission]);
 
   const goToUserLocation = useCallback(() => {
+    if (Platform.OS === 'web') {
+      console.log('Location features not available on web');
+      return;
+    }
+    
     if (userLocation && mapRef.current) {
       mapRef.current.animateToRegion({
         ...userLocation,
@@ -67,6 +92,11 @@ export default function TrafficMapScreen() {
   };
 
   const handleSearchResult = (result: { lat: number; lng: number; name?: string }) => {
+    if (Platform.OS === 'web') {
+      console.log('Search navigation not available on web');
+      return;
+    }
+    
     if (mapRef.current) {
       mapRef.current.animateToRegion({
         latitude: result.lat,
@@ -77,18 +107,29 @@ export default function TrafficMapScreen() {
     }
   };
 
-  // Fallback for web platform
+  // Web fallback component
   if (Platform.OS === 'web') {
     return (
       <View style={styles.container}>
-        <Text style={styles.webMessage}>
-          Google Maps with traffic data is not fully supported on web.
-          Please use the mobile app for the full experience.
-        </Text>
+        <View style={styles.webContainer}>
+          <Text style={styles.webTitle}>Traffic Tracker</Text>
+          <Text style={styles.webMessage}>
+            Google Maps with traffic data is not fully supported on web.
+            Please use the mobile app for the full experience.
+          </Text>
+          <View style={styles.webFeatures}>
+            <Text style={styles.webFeaturesTitle}>Available on Mobile:</Text>
+            <Text style={styles.webFeature}>• Real-time traffic data</Text>
+            <Text style={styles.webFeature}>• Location search</Text>
+            <Text style={styles.webFeature}>• GPS navigation</Text>
+            <Text style={styles.webFeature}>• Traffic condition indicators</Text>
+          </View>
+        </View>
       </View>
     );
   }
 
+  // Native component with MapView
   return (
     <View style={styles.container}>
       <MapView
@@ -181,10 +222,47 @@ const styles = StyleSheet.create({
     color: "red",
     fontWeight: "bold",
   },
-  webMessage: {
-    fontSize: 16,
+  webContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 40,
+    backgroundColor: "#f8f9fa",
+  },
+  webTitle: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: "#2f95dc",
+    marginBottom: 20,
     textAlign: "center",
-    padding: 20,
+  },
+  webMessage: {
+    fontSize: 18,
+    textAlign: "center",
     color: "#555",
+    marginBottom: 30,
+    lineHeight: 24,
+  },
+  webFeatures: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  webFeaturesTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 15,
+  },
+  webFeature: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 8,
+    lineHeight: 20,
   },
 });

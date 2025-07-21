@@ -1,6 +1,6 @@
 import React from "react";
-import { StyleSheet, View, TouchableOpacity } from "react-native";
-import { MapPin, Layers, ZoomIn, ZoomOut } from "lucide-react-native";
+import { StyleSheet, View, TouchableOpacity, Platform } from "react-native";
+import { MapPin, Layers } from "lucide-react-native";
 
 type MapControlsProps = {
   onMyLocationPress: () => void;
@@ -13,6 +13,11 @@ export default function MapControls({
   showTraffic,
   onToggleTraffic,
 }: MapControlsProps) {
+  // Don't render controls on web
+  if (Platform.OS === 'web') {
+    return null;
+  }
+
   return (
     <View style={styles.controlsContainer}>
       <TouchableOpacity

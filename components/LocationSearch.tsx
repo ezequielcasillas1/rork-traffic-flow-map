@@ -7,6 +7,7 @@ import {
   Text,
   ActivityIndicator,
   FlatList,
+  Platform,
 } from "react-native";
 import { Search, X } from "lucide-react-native";
 
@@ -71,6 +72,11 @@ export function LocationSearch({ onSelectLocation }: LocationSearchProps) {
     setSearchResults([]);
     setShowResults(false);
   };
+
+  // Don't render search on web
+  if (Platform.OS === 'web') {
+    return null;
+  }
 
   return (
     <View style={styles.container}>
