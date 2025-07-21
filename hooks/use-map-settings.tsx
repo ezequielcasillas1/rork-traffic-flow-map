@@ -10,6 +10,13 @@ export const [MapSettingsProvider, useMapSettings] = createContextHook(() => {
   const [showTraffic, setShowTraffic] = useState<boolean>(true);
   const [showLegend, setShowLegend] = useState<boolean>(true);
   const [mapType, setMapType] = useState<MapType>("standard");
+  
+  // Notification settings
+  const [alertRadius, setAlertRadius] = useState<number>(5); // in miles
+  const [trafficAlertsEnabled, setTrafficAlertsEnabled] = useState<boolean>(true);
+  const [roadClosuresEnabled, setRoadClosuresEnabled] = useState<boolean>(true);
+  const [accidentsEnabled, setAccidentsEnabled] = useState<boolean>(true);
+  
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Load settings from AsyncStorage on mount
@@ -28,6 +35,10 @@ export const [MapSettingsProvider, useMapSettings] = createContextHook(() => {
           setShowTraffic(settings.showTraffic ?? true);
           setShowLegend(settings.showLegend ?? true);
           setMapType(settings.mapType ?? "standard");
+          setAlertRadius(settings.alertRadius ?? 5);
+          setTrafficAlertsEnabled(settings.trafficAlertsEnabled ?? true);
+          setRoadClosuresEnabled(settings.roadClosuresEnabled ?? true);
+          setAccidentsEnabled(settings.accidentsEnabled ?? true);
         }
       } catch (error) {
         console.error("Failed to load map settings:", error);
@@ -48,6 +59,10 @@ export const [MapSettingsProvider, useMapSettings] = createContextHook(() => {
             showTraffic,
             showLegend,
             mapType,
+            alertRadius,
+            trafficAlertsEnabled,
+            roadClosuresEnabled,
+            accidentsEnabled,
           };
           await AsyncStorage.setItem("mapSettings", JSON.stringify(settings));
         } catch (error) {
@@ -57,7 +72,7 @@ export const [MapSettingsProvider, useMapSettings] = createContextHook(() => {
 
       saveSettings();
     }
-  }, [showTraffic, showLegend, mapType, isLoading]);
+  }, [showTraffic, showLegend, mapType, alertRadius, trafficAlertsEnabled, roadClosuresEnabled, accidentsEnabled, isLoading]);
 
   return {
     showTraffic,
@@ -66,6 +81,14 @@ export const [MapSettingsProvider, useMapSettings] = createContextHook(() => {
     setShowLegend,
     mapType,
     setMapType,
+    alertRadius,
+    setAlertRadius,
+    trafficAlertsEnabled,
+    setTrafficAlertsEnabled,
+    roadClosuresEnabled,
+    setRoadClosuresEnabled,
+    accidentsEnabled,
+    setAccidentsEnabled,
     isLoading,
   };
 });

@@ -1,0 +1,95 @@
+import React from "react";
+import { StyleSheet, View, Text, Platform } from "react-native";
+import { Slider } from "@react-native-community/slider";
+
+type AlertRadiusSliderProps = {
+  value: number;
+  onValueChange: (value: number) => void;
+  disabled?: boolean;
+};
+
+export function AlertRadiusSlider({ value, onValueChange, disabled }: AlertRadiusSliderProps) {
+  // Don't render slider on web
+  if (Platform.OS === 'web') {
+    return (
+      <View style={styles.webContainer}>
+        <Text style={styles.webText}>Alert radius: {value} miles</Text>
+        <Text style={styles.webSubtext}>Slider not available on web</Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.labelContainer}>
+        <Text style={styles.label}>1 mile</Text>
+        <Text style={styles.currentValue}>{value} miles</Text>
+        <Text style={styles.label}>10 miles</Text>
+      </View>
+      
+      <Slider
+        style={styles.slider}
+        minimumValue={1}
+        maximumValue={10}
+        step={1}
+        value={value}
+        onValueChange={onValueChange}
+        minimumTrackTintColor="#2f95dc"
+        maximumTrackTintColor="#d3d3d3"
+        thumbStyle={styles.thumb}
+        trackStyle={styles.track}
+        disabled={disabled}
+        testID="alert-radius-slider"
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    marginVertical: 10,
+  },
+  labelContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  label: {
+    fontSize: 12,
+    color: "#666",
+  },
+  currentValue: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#2f95dc",
+  },
+  slider: {
+    width: "100%",
+    height: 40,
+  },
+  thumb: {
+    backgroundColor: "#2f95dc",
+    width: 20,
+    height: 20,
+  },
+  track: {
+    height: 4,
+    borderRadius: 2,
+  },
+  webContainer: {
+    padding: 15,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  webText: {
+    fontSize: 16,
+    color: "#333",
+    marginBottom: 4,
+  },
+  webSubtext: {
+    fontSize: 12,
+    color: "#666",
+  },
+});

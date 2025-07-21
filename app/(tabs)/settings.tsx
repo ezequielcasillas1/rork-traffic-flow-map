@@ -1,6 +1,8 @@
 import React from "react";
 import { StyleSheet, View, Text, Switch, ScrollView, TouchableOpacity, Platform } from "react-native";
+import { ChevronRight } from "lucide-react-native";
 import { useMapSettings } from "@/hooks/use-map-settings";
+import { AlertRadiusSlider } from "@/components/AlertRadiusSlider";
 
 export default function SettingsScreen() {
   const { 
@@ -9,11 +11,104 @@ export default function SettingsScreen() {
     mapType,
     setMapType,
     showLegend,
-    setShowLegend
+    setShowLegend,
+    alertRadius,
+    setAlertRadius,
+    trafficAlertsEnabled,
+    setTrafficAlertsEnabled,
+    roadClosuresEnabled,
+    setRoadClosuresEnabled,
+    accidentsEnabled,
+    setAccidentsEnabled,
   } = useMapSettings();
+
+  const handlePrivacyPolicy = () => {
+    console.log("Privacy Policy pressed");
+  };
+
+  const handleTermsOfService = () => {
+    console.log("Terms of Service pressed");
+  };
+
+  const handleAbout = () => {
+    console.log("About Traffic Tracker pressed");
+  };
 
   return (
     <ScrollView style={styles.container}>
+      {/* Alert Radius Section */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Alert Radius</Text>
+        <Text style={styles.sectionDescription}>
+          Receive alerts for traffic incidents within this distance
+        </Text>
+        
+        <AlertRadiusSlider
+          value={alertRadius}
+          onValueChange={setAlertRadius}
+          disabled={Platform.OS === 'web'}
+        />
+      </View>
+
+      {/* Notifications Section */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Notifications</Text>
+        
+        <View style={styles.settingItem}>
+          <View style={styles.settingContent}>
+            <Text style={styles.settingLabel}>Traffic Alerts</Text>
+            <Text style={styles.settingDescription}>Updates on nearby traffic jams</Text>
+          </View>
+          <Switch
+            value={trafficAlertsEnabled}
+            onValueChange={setTrafficAlertsEnabled}
+            trackColor={{ false: "#767577", true: "#81b0ff" }}
+            thumbColor={trafficAlertsEnabled ? "#2f95dc" : "#f4f3f4"}
+            testID="traffic-alerts-toggle"
+            disabled={Platform.OS === 'web'}
+          />
+        </View>
+        
+        <View style={styles.settingItem}>
+          <View style={styles.settingContent}>
+            <Text style={styles.settingLabel}>Road Closures</Text>
+            <Text style={styles.settingDescription}>Alerts for closed or blocked roads</Text>
+          </View>
+          <Switch
+            value={roadClosuresEnabled}
+            onValueChange={setRoadClosuresEnabled}
+            trackColor={{ false: "#767577", true: "#81b0ff" }}
+            thumbColor={roadClosuresEnabled ? "#2f95dc" : "#f4f3f4"}
+            testID="road-closures-toggle"
+            disabled={Platform.OS === 'web'}
+          />
+        </View>
+        
+        <View style={styles.settingItem}>
+          <View style={styles.settingContent}>
+            <Text style={styles.settingLabel}>Accidents</Text>
+            <Text style={styles.settingDescription}>Notifications about nearby accidents</Text>
+          </View>
+          <Switch
+            value={accidentsEnabled}
+            onValueChange={setAccidentsEnabled}
+            trackColor={{ false: "#767577", true: "#81b0ff" }}
+            thumbColor={accidentsEnabled ? "#2f95dc" : "#f4f3f4"}
+            testID="accidents-toggle"
+            disabled={Platform.OS === 'web'}
+          />
+        </View>
+
+        {Platform.OS === 'web' && (
+          <View style={styles.webNotice}>
+            <Text style={styles.webNoticeText}>
+              Notification settings are only available on mobile devices.
+            </Text>
+          </View>
+        )}
+      </View>
+
+      {/* Map Settings Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Map Settings</Text>
         
@@ -78,12 +173,39 @@ export default function SettingsScreen() {
           </View>
         )}
       </View>
+
+      {/* App Info Section */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>App Info</Text>
+        
+        <View style={styles.infoItem}>
+          <Text style={styles.infoLabel}>Version</Text>
+          <Text style={styles.infoValue}>2.4.1</Text>
+        </View>
+        
+        <View style={styles.infoItem}>
+          <Text style={styles.infoLabel}>Last Updated</Text>
+          <Text style={styles.infoValue}>July 15, 2025</Text>
+        </View>
+        
+        <TouchableOpacity style={styles.linkItem} onPress={handlePrivacyPolicy}>
+          <Text style={styles.linkLabel}>Privacy Policy</Text>
+          <ChevronRight size={20} color="#999" />
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.linkItem} onPress={handleTermsOfService}>
+          <Text style={styles.linkLabel}>Terms of Service</Text>
+          <ChevronRight size={20} color="#999" />
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.linkItem} onPress={handleAbout}>
+          <Text style={styles.linkLabel}>About Traffic Tracker</Text>
+          <ChevronRight size={20} color="#999" />
+        </TouchableOpacity>
+      </View>
       
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>About</Text>
-        <Text style={styles.aboutText}>
-          Traffic Tracker App v1.0.0
-        </Text>
+        <Text style={styles.sectionTitle}>Traffic Information</Text>
         <Text style={styles.aboutDescription}>
           This app displays real-time traffic data using Google Maps API.
           Traffic conditions are indicated by color-coded lines:
@@ -111,6 +233,7 @@ export default function SettingsScreen() {
             <Text style={styles.webInfoText}>• No GPS location services</Text>
             <Text style={styles.webInfoText}>• No traffic data visualization</Text>
             <Text style={styles.webInfoText}>• Limited search functionality</Text>
+            <Text style={styles.webInfoText}>• No push notifications</Text>
           </View>
         )}
       </View>
@@ -138,8 +261,14 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 15,
+    marginBottom: 8,
     color: "#333",
+  },
+  sectionDescription: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 15,
+    lineHeight: 18,
   },
   settingItem: {
     flexDirection: "row",
@@ -149,9 +278,19 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
   },
+  settingContent: {
+    flex: 1,
+    marginRight: 15,
+  },
   settingLabel: {
     fontSize: 16,
     color: "#444",
+    marginBottom: 2,
+  },
+  settingDescription: {
+    fontSize: 13,
+    color: "#666",
+    lineHeight: 16,
   },
   mapTypeContainer: {
     flexDirection: "row",
@@ -180,6 +319,34 @@ const styles = StyleSheet.create({
   mapTypeTextDisabled: {
     color: "#999",
   },
+  infoItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  infoLabel: {
+    fontSize: 16,
+    color: "#444",
+  },
+  infoValue: {
+    fontSize: 16,
+    color: "#666",
+  },
+  linkItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  linkLabel: {
+    fontSize: 16,
+    color: "#444",
+  },
   webNotice: {
     backgroundColor: "#fff3cd",
     padding: 12,
@@ -191,11 +358,6 @@ const styles = StyleSheet.create({
   webNoticeText: {
     color: "#856404",
     fontSize: 14,
-  },
-  aboutText: {
-    fontSize: 16,
-    marginBottom: 10,
-    color: "#444",
   },
   aboutDescription: {
     fontSize: 14,
