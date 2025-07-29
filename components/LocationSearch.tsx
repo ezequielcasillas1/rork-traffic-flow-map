@@ -10,25 +10,31 @@ import {
   Platform,
 } from "react-native";
 import { Search, X } from "lucide-react-native";
+import { useEffect } from "react";
 
 type LocationSearchProps = {
   onSelectLocation: (location: { lat: number; lng: number; name?: string }) => void;
 };
 
-// Mock search results for demo purposes
-// In a real app, this would come from Google Places API
-const mockSearchResults = [
-  { id: "1", name: "New York City", lat: 40.7128, lng: -74.006 },
-  { id: "2", name: "Los Angeles", lat: 34.0522, lng: -118.2437 },
-  { id: "3", name: "Chicago", lat: 41.8781, lng: -87.6298 },
-  { id: "4", name: "San Francisco", lat: 37.7749, lng: -122.4194 },
-  { id: "5", name: "Miami", lat: 25.7617, lng: -80.1918 },
-  { id: "6", name: "Seattle", lat: 47.6062, lng: -122.3321 },
-  { id: "7", name: "Boston", lat: 42.3601, lng: -71.0589 },
-  { id: "8", name: "Denver", lat: 39.7392, lng: -104.9903 },
-  { id: "9", name: "Austin", lat: 30.2672, lng: -97.7431 },
-  { id: "10", name: "Portland", lat: 45.5152, lng: -122.6784 },
-];
+// Remove mockSearchResults and replace search logic
+// Add import for useEffect
+const GOOGLE_PLACES_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
+
+const fetchPlaces = async (query: string) => {
+  if (!GOOGLE_PLACES_API_KEY) return [];
+  const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(query)}&key=${GOOGLE_PLACES_API_KEY}`;
+  const response = await fetch(url);
+  const data = await response.json();
+  if (data.status === "OK") {
+    return data.predictions.map((item: any) => ({
+      id: item.place_id,
+      name: item.description,
+      lat: null,
+      lng: null,
+    }));
+  }
+  return [];
+};
 
 export function LocationSearch({ onSelectLocation }: LocationSearchProps) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -41,7 +47,8 @@ export function LocationSearch({ onSelectLocation }: LocationSearchProps) {
   }>>([]);
   const [showResults, setShowResults] = useState(false);
 
-  const handleSearch = (text: string) => {
+  // Replace mockSearchResults and handleSearch
+  const handleSearch = async (text: string) => {
     setSearchQuery(text);
     
     if (text.length > 2) {
@@ -49,13 +56,9 @@ export function LocationSearch({ onSelectLocation }: LocationSearchProps) {
       setShowResults(true);
       
       // Simulate API call delay
-      setTimeout(() => {
-        const filteredResults = mockSearchResults.filter((item) =>
-          item.name.toLowerCase().includes(text.toLowerCase())
-        );
-        setSearchResults(filteredResults);
-        setIsSearching(false);
-      }, 300);
+      const results = await fetchPlaces(text);
+      setSearchResults(results);
+      setIsSearching(false);
     } else {
       setSearchResults([]);
       setShowResults(false);
@@ -63,27 +66,19 @@ export function LocationSearch({ onSelectLocation }: LocationSearchProps) {
     }
   };
 
-  const handleSelectLocation = (location: {
-    id: string;
-    name: string;
-    lat: number;
-    lng: number;
-  }) => {
-    console.log('Location selected:', location);
-    
-    // Call the parent callback with the location data
-    onSelectLocation({ 
-      lat: location.lat, 
-      lng: location.lng, 
-      name: location.name 
-    });
-    
-    // Update the search query to show the selected location
-    setSearchQuery(location.name);
-    
-    // Hide the results
-    setShowResults(false);
-    setSearchResults([]);
+  // In handleSelectLocation, fetch place details for lat/lng
+  const handleSelectLocation = async (location: { id: string; name: string; lat: number | null; lng: number | null; }) => {
+    if (!GOOGLE_PLACES_API_KEY) return;
+    const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${location.id}&key=${GOOGLE_PLACES_API_KEY}`;
+    const response = await fetch(detailsUrl);
+    const data = await response.json();
+    if (data.status === "OK") {
+      const { lat, lng } = data.result.geometry.location;
+      onSelectLocation({ lat, lng, name: location.name });
+      setSearchQuery(location.name);
+      setShowResults(false);
+      setSearchResults([]);
+    }
   };
 
   const clearSearch = () => {

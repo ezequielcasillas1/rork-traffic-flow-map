@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View, Text, Switch, ScrollView, TouchableOpacity, Platform } from "react-native";
+import { StyleSheet, View, Text, Switch, ScrollView, TouchableOpacity, Platform, Alert } from "react-native";
 import { ChevronRight } from "lucide-react-native";
 import { useMapSettings } from "@/hooks/use-map-settings";
 import { AlertRadiusSlider } from "@/components/AlertRadiusSlider";
@@ -22,16 +22,41 @@ export default function SettingsScreen() {
     setAccidentsEnabled,
   } = useMapSettings();
 
-  const handlePrivacyPolicy = () => {
-    console.log("Privacy Policy pressed");
-  };
-
   const handleTermsOfService = () => {
-    console.log("Terms of Service pressed");
+    Alert.alert(
+      "Terms of Use",
+      "Effective Date: January 2025\n\n" +
+      "These Terms govern your use of the Traffic Tracker mobile application. By using the app, you agree to these terms.\n\n" +
+      "1. Eligibility\n" +
+      "You must be at least 13 years old or have parental/guardian consent to use this app.\n\n" +
+      "2. App Usage\n" +
+      "• Use the app responsibly and in accordance with traffic laws.\n" +
+      "• Do not use the app while operating a vehicle unless it's in hands-free mode.\n\n" +
+      "3. License\n" +
+      "You are granted a limited, non-exclusive, non-transferable license to use Traffic Tracker for personal use only.\n\n" +
+      "4. Limitations\n" +
+      "We do our best to ensure data accuracy, but Traffic Tracker is not liable for:\n" +
+      "• Inaccurate or delayed alerts.\n" +
+      "• Decisions made based on app information.\n" +
+      "• Any direct or indirect damage resulting from app usage.\n\n" +
+      "5. Updates and Changes\n" +
+      "We may modify these Terms and the app features at any time. Continued use of the app indicates your acceptance of updated terms.",
+      [{ text: "OK" }]
+    );
   };
 
   const handleAbout = () => {
-    console.log("About Traffic Tracker pressed");
+    Alert.alert(
+      "About Traffic Tracker",
+      "Traffic Tracker is your real-time companion for safe and smart navigation. We provide users with timely alerts on traffic congestion, road closures, accidents, and hazards nearby. Whether you're commuting or planning a trip, Traffic Tracker helps you stay ahead of delays and drive with confidence.\n\n" +
+      "Key Features:\n" +
+      "• Live traffic notification alerts\n" +
+      "• Real-time accident and hazard notifications\n" +
+      "• Road closure updates\n" +
+      "• Visual traffic heatmaps (color-coded by severity) - In Development\n\n" +
+      "Traffic Tracker is built with user experience, safety, and accuracy in mind. Our mission is to make travel easier for everyone, using technology to keep you informed and on the move.",
+      [{ text: "OK" }]
+    );
   };
 
   return (
@@ -180,18 +205,13 @@ export default function SettingsScreen() {
         
         <View style={styles.infoItem}>
           <Text style={styles.infoLabel}>Version</Text>
-          <Text style={styles.infoValue}>2.4.1</Text>
+          <Text style={styles.infoValue}>1.0</Text>
         </View>
         
         <View style={styles.infoItem}>
           <Text style={styles.infoLabel}>Last Updated</Text>
-          <Text style={styles.infoValue}>July 15, 2025</Text>
+          <Text style={styles.infoValue}>08/2025</Text>
         </View>
-        
-        <TouchableOpacity style={styles.linkItem} onPress={handlePrivacyPolicy}>
-          <Text style={styles.linkLabel}>Privacy Policy</Text>
-          <ChevronRight size={20} color="#999" />
-        </TouchableOpacity>
         
         <TouchableOpacity style={styles.linkItem} onPress={handleTermsOfService}>
           <Text style={styles.linkLabel}>Terms of Service</Text>
@@ -364,6 +384,45 @@ const styles = StyleSheet.create({
     color: "#666",
     lineHeight: 20,
     marginBottom: 15,
+  },
+  aboutSubtitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginTop: 15,
+    marginBottom: 8,
+    color: "#333",
+  },
+  featureList: {
+    marginBottom: 15,
+  },
+  featureItem: {
+    fontSize: 14,
+    color: "#555",
+    marginBottom: 4,
+  },
+  termsDate: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 8,
+  },
+  termsDescription: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 15,
+    lineHeight: 18,
+  },
+  termsSubtitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginTop: 15,
+    marginBottom: 8,
+    color: "#333",
+  },
+  termsText: {
+    fontSize: 14,
+    color: "#555",
+    marginBottom: 4,
+    lineHeight: 18,
   },
   trafficInfo: {
     marginTop: 10,

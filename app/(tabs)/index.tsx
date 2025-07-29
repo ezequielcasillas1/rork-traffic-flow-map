@@ -46,7 +46,7 @@ export default function TrafficMapScreen() {
   } | null>(null);
   const [searchedLocation, setSearchedLocation] = useState<SearchedLocation | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
-  const { showTraffic, setShowTraffic } = useMapSettings();
+  const { showTraffic, setShowTraffic, mapType } = useMapSettings();
 
   const requestLocationPermission = useCallback(async () => {
     try {
@@ -164,6 +164,7 @@ export default function TrafficMapScreen() {
         showsUserLocation
         showsMyLocationButton={false}
         showsTraffic={showTraffic}
+        mapType={mapType}
         onRegionChangeComplete={handleRegionChange}
         testID="traffic-map"
       >
