@@ -1,0 +1,111 @@
+{
+  "expo": {
+    "name": "Traffic Tracker",
+    "slug": "traffic-flow-map",
+    "version": "1.0.1",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "traffictracker",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "extra": {
+      "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyCYObeujRbMi5mXvhEtGbR8KaYp61PYHPo",
+      "EXPO_PUBLIC_SUPABASE_URL": "https://jemfnqvnnzjlnuwnfbde.supabase.co",
+      "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImplbWZucXZubnpqbG51d25mYmRlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4MDU4NjksImV4cCI6MjA2OTM4MTg2OX0.wkebc9gKnvx-e0zFU8e7bDwJj-_JAWmU5RTfc2SpvFQ",
+      "router": {
+        "origin": "https://rork.com/"
+      },
+      "eas": {
+        "projectId": "b40a5dce-6ee6-4fde-b20f-b725c944a52b"
+      }
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.rork.traffic-tracker",
+      "buildNumber": "2",
+      "infoPlist": {
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Traffic Tracker needs your location to show nearby traffic incidents and provide accurate navigation.",
+        "NSLocationAlwaysUsageDescription": "Traffic Tracker uses your location to provide real-time traffic updates and incident alerts.",
+        "NSLocationWhenInUseUsageDescription": "Traffic Tracker needs your location to show nearby traffic incidents and provide accurate navigation.",
+        "UIBackgroundModes": [
+          "location",
+          "remote-notification"
+        ],
+        "ITSAppUsesNonExemptEncryption": false,
+        "CFBundleDisplayName": "Traffic Tracker",
+        "CFBundleName": "Traffic Tracker",
+        "CFBundleShortVersionString": "1.0.0",
+        "CFBundleVersion": "1"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "app.rork.trafficflowmap",
+      "versionCode": 2,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_BACKGROUND_LOCATION",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_LOCATION",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.VIBRATE"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "origin": "https://rork.com/"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "isAndroidForegroundServiceEnabled": true,
+          "isAndroidBackgroundLocationEnabled": true,
+          "isIosBackgroundLocationEnabled": true,
+          "locationAlwaysAndWhenInUsePermission": "Traffic Tracker needs your location to show nearby traffic incidents and provide accurate navigation."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#ffffff"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "owner": "casiezeq",
+    "privacy": "public",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "description": "Real-time traffic tracking with incident alerts and navigation assistance.",
+    "keywords": [
+      "traffic",
+      "navigation",
+      "maps",
+      "incidents",
+      "alerts"
+    ],
+    "primaryColor": "#007AFF"
+  }
+}
