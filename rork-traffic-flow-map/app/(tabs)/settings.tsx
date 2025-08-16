@@ -1,8 +1,11 @@
 import React from "react";
 import { StyleSheet, View, Text, Switch, ScrollView, TouchableOpacity, Platform, Alert } from "react-native";
-import { ChevronRight } from "lucide-react-native";
-import { useMapSettings } from "@/hooks/use-map-settings";
-import { AlertRadiusSlider } from "@/components/AlertRadiusSlider";
+import { ChevronRight, Moon, Sun, Map, Bell, Settings as SettingsIcon } from "lucide-react-native";
+import { useMapSettings } from "@/hooks/useMapSettings";
+import { useTheme } from "@/hooks/useTheme";
+import { TransparentCard } from "@/components/TransparentCard";
+import { TransparentButton } from "@/components/TransparentButton";
+import { colors } from "@/constants/colors";
 
 export default function SettingsScreen() {
   const { 
@@ -21,6 +24,8 @@ export default function SettingsScreen() {
     accidentsEnabled,
     setAccidentsEnabled,
   } = useMapSettings();
+
+  const { isDark, toggleTheme } = useTheme();
 
   const handleTermsOfService = () => {
     Alert.alert(
@@ -60,203 +65,268 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Alert Radius Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Alert Radius</Text>
-        <Text style={styles.sectionDescription}>
-          Receive alerts for traffic incidents within this distance
-        </Text>
-        
-        <AlertRadiusSlider
-          value={alertRadius}
-          onValueChange={setAlertRadius}
-          disabled={Platform.OS === 'web'}
-        />
-      </View>
-
-      {/* Notifications Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Notifications</Text>
-        
-        <View style={styles.settingItem}>
-          <View style={styles.settingContent}>
-            <Text style={styles.settingLabel}>Traffic Alerts</Text>
-            <Text style={styles.settingDescription}>Updates on nearby traffic jams</Text>
-          </View>
-          <Switch
-            value={trafficAlertsEnabled}
-            onValueChange={setTrafficAlertsEnabled}
-            trackColor={{ false: "#767577", true: "#81b0ff" }}
-            thumbColor={trafficAlertsEnabled ? "#2f95dc" : "#f4f3f4"}
-            testID="traffic-alerts-toggle"
-            disabled={Platform.OS === 'web'}
-          />
-        </View>
-        
-        <View style={styles.settingItem}>
-          <View style={styles.settingContent}>
-            <Text style={styles.settingLabel}>Road Closures</Text>
-            <Text style={styles.settingDescription}>Alerts for closed or blocked roads</Text>
-          </View>
-          <Switch
-            value={roadClosuresEnabled}
-            onValueChange={setRoadClosuresEnabled}
-            trackColor={{ false: "#767577", true: "#81b0ff" }}
-            thumbColor={roadClosuresEnabled ? "#2f95dc" : "#f4f3f4"}
-            testID="road-closures-toggle"
-            disabled={Platform.OS === 'web'}
-          />
-        </View>
-        
-        <View style={styles.settingItem}>
-          <View style={styles.settingContent}>
-            <Text style={styles.settingLabel}>Accidents</Text>
-            <Text style={styles.settingDescription}>Notifications about nearby accidents</Text>
-          </View>
-          <Switch
-            value={accidentsEnabled}
-            onValueChange={setAccidentsEnabled}
-            trackColor={{ false: "#767577", true: "#81b0ff" }}
-            thumbColor={accidentsEnabled ? "#2f95dc" : "#f4f3f4"}
-            testID="accidents-toggle"
-            disabled={Platform.OS === 'web'}
-          />
-        </View>
-
-        {Platform.OS === 'web' && (
-          <View style={styles.webNotice}>
-            <Text style={styles.webNoticeText}>
-              Notification settings are only available on mobile devices.
+    <ScrollView style={[styles.container, { backgroundColor: isDark ? colors.black.primary : colors.white.primary }]}>
+      {/* Modern Header */}
+      <TransparentCard variant="heavy" style={styles.header}>
+        <View style={styles.headerContent}>
+          <SettingsIcon size={32} color={isDark ? colors.white.primary : colors.black.primary} />
+          <View style={styles.headerText}>
+            <Text style={[styles.headerTitle, { color: isDark ? colors.white.primary : colors.black.primary }]}>Settings</Text>
+            <Text style={[styles.headerSubtitle, { color: isDark ? colors.white.primary : colors.black.primary }]}>
+              Customize your experience
             </Text>
           </View>
-        )}
-      </View>
+        </View>
+      </TransparentCard>
+
+      {/* Appearance Section */}
+      <TransparentCard variant="medium" style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionContent}>
+            <View style={styles.sectionIcon}>
+              {isDark ? <Moon size={24} color={isDark ? colors.white.primary : colors.black.primary} /> : <Sun size={24} color={isDark ? colors.white.primary : colors.black.primary} />}
+            </View>
+            <View style={styles.sectionText}>
+              <Text style={[styles.sectionTitle, { color: isDark ? colors.white.primary : colors.black.primary }]}>Appearance</Text>
+              <Text style={[styles.sectionDescription, { color: isDark ? colors.white.primary : colors.black.primary }]}>
+                Dark mode and visual preferences
+              </Text>
+            </View>
+          </View>
+          <Switch
+            value={isDark}
+            onValueChange={toggleTheme}
+            trackColor={{ false: colors.gray.primary, true: colors.accent.blue }}
+            thumbColor={colors.white.primary}
+            disabled={Platform.OS === 'web'}
+            testID="theme-toggle"
+          />
+        </View>
+      </TransparentCard>
 
       {/* Map Settings Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Map Settings</Text>
-        
-        <View style={styles.settingItem}>
-          <Text style={styles.settingLabel}>Show Traffic</Text>
-          <Switch
-            value={showTraffic}
-            onValueChange={setShowTraffic}
-            trackColor={{ false: "#767577", true: "#81b0ff" }}
-            thumbColor={showTraffic ? "#2f95dc" : "#f4f3f4"}
-            testID="traffic-toggle"
-            disabled={Platform.OS === 'web'}
-          />
+      <TransparentCard variant="medium" style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionContent}>
+                         <View style={styles.sectionIcon}>
+               <Map size={24} color={isDark ? colors.white.primary : colors.black.primary} />
+             </View>
+             <View style={styles.sectionText}>
+               <Text style={[styles.sectionTitle, { color: isDark ? colors.white.primary : colors.black.primary }]}>Map Settings</Text>
+               <Text style={[styles.sectionDescription, { color: isDark ? colors.white.primary : colors.black.primary }]}>
+                 Customize your map view and display options
+               </Text>
+             </View>
+          </View>
         </View>
         
-        <View style={styles.settingItem}>
-          <Text style={styles.settingLabel}>Show Traffic Legend</Text>
-          <Switch
-            value={showLegend}
-            onValueChange={setShowLegend}
-            trackColor={{ false: "#767577", true: "#81b0ff" }}
-            thumbColor={showLegend ? "#2f95dc" : "#f4f3f4"}
-            testID="legend-toggle"
-            disabled={Platform.OS === 'web'}
-          />
+        <View style={styles.settingItems}>
+                     <View style={[styles.settingItem, { borderBottomColor: isDark ? colors.glass.light : colors.gray.light }]}>
+             <Text style={[styles.settingLabel, { color: isDark ? colors.white.primary : colors.black.primary }]}>Show Traffic</Text>
+             <Switch
+               value={showTraffic}
+               onValueChange={setShowTraffic}
+               trackColor={{ false: colors.gray.primary, true: colors.accent.blue }}
+               thumbColor={colors.white.primary}
+               testID="traffic-toggle"
+               disabled={Platform.OS === 'web'}
+             />
+           </View>
+           
+           <View style={styles.settingItem}>
+             <Text style={[styles.settingLabel, { color: isDark ? colors.white.primary : colors.black.primary }]}>Show Traffic Legend</Text>
+             <Switch
+               value={showLegend}
+               onValueChange={setShowLegend}
+               trackColor={{ false: colors.gray.primary, true: colors.accent.blue }}
+               thumbColor={colors.white.primary}
+               testID="legend-toggle"
+               disabled={Platform.OS === 'web'}
+             />
+           </View>
         </View>
-        
-        <View style={styles.settingItem}>
-          <Text style={styles.settingLabel}>Map Type</Text>
+
+                 <View style={[styles.mapTypeSection, { borderTopColor: isDark ? colors.glass.light : colors.gray.light }]}>
+           <Text style={[styles.mapTypeLabel, { color: isDark ? colors.white.primary : colors.black.primary }]}>Map Type</Text>
           <View style={styles.mapTypeContainer}>
-            {["standard", "satellite", "hybrid"].map((type) => (
+            {(["standard", "satellite", "hybrid"] as const).map((type) => (
               <TouchableOpacity
                 key={type}
                 style={[
                   styles.mapTypeButton,
-                  mapType === type && styles.mapTypeButtonActive,
-                  Platform.OS === 'web' && styles.mapTypeButtonDisabled,
+                  { borderColor: colors.glass.medium },
+                  mapType === type && { 
+                    backgroundColor: colors.accent.blue, 
+                    borderColor: colors.accent.blue 
+                  },
+                  Platform.OS === 'web' && { opacity: 0.6 }
                 ]}
                 onPress={() => Platform.OS !== 'web' && setMapType(type)}
                 testID={`map-type-${type}`}
                 disabled={Platform.OS === 'web'}
               >
-                <Text
-                  style={[
-                    styles.mapTypeText,
-                    mapType === type && styles.mapTypeTextActive,
-                    Platform.OS === 'web' && styles.mapTypeTextDisabled,
-                  ]}
-                >
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </Text>
+                                 <Text
+                   style={[
+                     styles.mapTypeText,
+                     { color: isDark ? colors.white.primary : colors.black.primary },
+                     mapType === type && { color: colors.white.primary },
+                     Platform.OS === 'web' && { color: colors.gray.primary }
+                   ]}
+                 >
+                   {type.charAt(0).toUpperCase() + type.slice(1)}
+                 </Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
+      </TransparentCard>
 
-        {Platform.OS === 'web' && (
-          <View style={styles.webNotice}>
-            <Text style={styles.webNoticeText}>
-              Map settings are only available on mobile devices.
-            </Text>
+      {/* Notifications Section */}
+      <TransparentCard variant="medium" style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionContent}>
+                         <View style={styles.sectionIcon}>
+               <Bell size={24} color={isDark ? colors.white.primary : colors.black.primary} />
+             </View>
+             <View style={styles.sectionText}>
+               <Text style={[styles.sectionTitle, { color: isDark ? colors.white.primary : colors.black.primary }]}>Notifications</Text>
+               <Text style={[styles.sectionDescription, { color: isDark ? colors.white.primary : colors.black.primary }]}>
+                 Choose what alerts you want to receive
+               </Text>
+             </View>
           </View>
-        )}
-      </View>
+        </View>
+        
+        <View style={styles.settingItems}>
+                     <View style={[styles.settingItem, { borderBottomColor: isDark ? colors.glass.light : colors.gray.light }]}>
+             <View style={styles.settingContent}>
+               <Text style={[styles.settingLabel, { color: isDark ? colors.white.primary : colors.black.primary }]}>Traffic Alerts</Text>
+               <Text style={[styles.settingDescription, { color: isDark ? colors.white.primary : colors.black.primary }]}>
+                 Updates on nearby traffic jams
+               </Text>
+             </View>
+             <Switch
+               value={trafficAlertsEnabled}
+               onValueChange={setTrafficAlertsEnabled}
+               trackColor={{ false: colors.gray.primary, true: colors.accent.blue }}
+               thumbColor={colors.white.primary}
+               testID="traffic-alerts-toggle"
+               disabled={Platform.OS === 'web'}
+             />
+           </View>
+           
+           <View style={[styles.settingItem, { borderBottomColor: isDark ? colors.glass.light : colors.gray.light }]}>
+             <View style={styles.settingContent}>
+               <Text style={[styles.settingLabel, { color: isDark ? colors.white.primary : colors.black.primary }]}>Road Closures</Text>
+               <Text style={[styles.settingDescription, { color: isDark ? colors.white.primary : colors.black.primary }]}>
+                 Alerts for closed or blocked roads
+               </Text>
+             </View>
+             <Switch
+               value={roadClosuresEnabled}
+               onValueChange={setRoadClosuresEnabled}
+               trackColor={{ false: colors.gray.primary, true: colors.accent.blue }}
+               thumbColor={colors.white.primary}
+               testID="road-closures-toggle"
+               disabled={Platform.OS === 'web'}
+             />
+           </View>
+           
+           <View style={styles.settingItem}>
+             <View style={styles.settingContent}>
+               <Text style={[styles.settingLabel, { color: isDark ? colors.white.primary : colors.black.primary }]}>Accidents</Text>
+               <Text style={[styles.settingDescription, { color: isDark ? colors.white.primary : colors.black.primary }]}>
+                 Notifications about nearby accidents
+               </Text>
+             </View>
+             <Switch
+               value={accidentsEnabled}
+               onValueChange={setAccidentsEnabled}
+               trackColor={{ false: colors.gray.primary, true: colors.accent.blue }}
+               thumbColor={colors.white.primary}
+               testID="accidents-toggle"
+               disabled={Platform.OS === 'web'}
+             />
+           </View>
+        </View>
+      </TransparentCard>
 
       {/* App Info Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>App Info</Text>
-        
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>Version</Text>
-          <Text style={styles.infoValue}>1.0</Text>
+      <TransparentCard variant="medium" style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionContent}>
+                         <View style={styles.sectionIcon}>
+               <SettingsIcon size={24} color={isDark ? colors.white.primary : colors.black.primary} />
+             </View>
+             <View style={styles.sectionText}>
+               <Text style={[styles.sectionTitle, { color: isDark ? colors.white.primary : colors.black.primary }]}>App Information</Text>
+               <Text style={[styles.sectionDescription, { color: isDark ? colors.white.primary : colors.black.primary }]}>
+                 Version details and legal information
+               </Text>
+             </View>
+          </View>
         </View>
         
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>Last Updated</Text>
-          <Text style={styles.infoValue}>08/2025</Text>
+        <View style={styles.settingItems}>
+                     <View style={[styles.settingItem, { borderBottomColor: isDark ? colors.glass.light : colors.gray.light }]}>
+             <Text style={[styles.settingLabel, { color: isDark ? colors.white.primary : colors.black.primary }]}>Version</Text>
+             <Text style={[styles.settingValue, { color: isDark ? colors.white.primary : colors.black.primary }]}>1.0.0</Text>
+           </View>
+           
+           <View style={[styles.settingItem, { borderBottomColor: isDark ? colors.glass.light : colors.gray.light }]}>
+             <Text style={[styles.settingLabel, { color: isDark ? colors.white.primary : colors.black.primary }]}>Last Updated</Text>
+             <Text style={[styles.settingValue, { color: isDark ? colors.white.primary : colors.black.primary }]}>January 2025</Text>
+           </View>
+           
+           <TouchableOpacity style={[styles.settingItem, { borderBottomColor: isDark ? colors.glass.light : colors.gray.light }]} onPress={handleTermsOfService}>
+             <Text style={[styles.settingLabel, { color: isDark ? colors.white.primary : colors.black.primary }]}>Terms of Service</Text>
+             <ChevronRight size={20} color={isDark ? colors.white.primary : colors.black.primary} />
+           </TouchableOpacity>
+           
+           <TouchableOpacity style={styles.settingItem} onPress={handleAbout}>
+             <Text style={[styles.settingLabel, { color: isDark ? colors.white.primary : colors.black.primary }]}>About Traffic Tracker</Text>
+             <ChevronRight size={20} color={isDark ? colors.white.primary : colors.black.primary} />
+           </TouchableOpacity>
         </View>
-        
-        <TouchableOpacity style={styles.linkItem} onPress={handleTermsOfService}>
-          <Text style={styles.linkLabel}>Terms of Service</Text>
-          <ChevronRight size={20} color="#999" />
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.linkItem} onPress={handleAbout}>
-          <Text style={styles.linkLabel}>About Traffic Tracker</Text>
-          <ChevronRight size={20} color="#999" />
-        </TouchableOpacity>
-      </View>
-      
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Traffic Information</Text>
-        <Text style={styles.aboutDescription}>
-          This app displays real-time traffic data using Google Maps API.
-          Traffic conditions are indicated by color-coded lines:
-        </Text>
+      </TransparentCard>
+
+      {/* Traffic Information Section */}
+      <TransparentCard variant="medium" style={styles.section}>
+        <View style={styles.sectionHeader}>
+          <View style={styles.sectionContent}>
+                         <View style={styles.sectionIcon}>
+               <Map size={24} color={isDark ? colors.white.primary : colors.black.primary} />
+             </View>
+             <View style={styles.sectionText}>
+               <Text style={[styles.sectionTitle, { color: isDark ? colors.white.primary : colors.black.primary }]}>Traffic Information</Text>
+               <Text style={[styles.sectionDescription, { color: isDark ? colors.white.primary : colors.black.primary }]}>
+                 Understanding traffic condition indicators
+               </Text>
+             </View>
+          </View>
+        </View>
         
         <View style={styles.trafficInfo}>
-          <View style={styles.trafficItem}>
-            <View style={[styles.trafficIndicator, styles.trafficGreen]} />
-            <Text style={styles.trafficText}>Light Traffic</Text>
-          </View>
-          <View style={styles.trafficItem}>
-            <View style={[styles.trafficIndicator, styles.trafficOrange]} />
-            <Text style={styles.trafficText}>Medium Traffic</Text>
-          </View>
-          <View style={styles.trafficItem}>
-            <View style={[styles.trafficIndicator, styles.trafficRed]} />
-            <Text style={styles.trafficText}>Heavy Traffic</Text>
-          </View>
+                     <View style={styles.trafficItem}>
+             <View style={[styles.trafficIndicator, { backgroundColor: colors.accent.green }]} />
+             <Text style={[styles.trafficText, { color: isDark ? colors.white.primary : colors.black.primary }]}>
+               Light Traffic - Free flowing conditions
+             </Text>
+           </View>
+           <View style={styles.trafficItem}>
+             <View style={[styles.trafficIndicator, { backgroundColor: colors.accent.yellow }]} />
+             <Text style={[styles.trafficText, { color: isDark ? colors.white.primary : colors.black.primary }]}>
+               Medium Traffic - Moderate delays expected
+             </Text>
+           </View>
+           <View style={styles.trafficItem}>
+             <View style={[styles.trafficIndicator, { backgroundColor: colors.accent.red }]} />
+             <Text style={[styles.trafficText, { color: isDark ? colors.white.primary : colors.black.primary }]}>
+               Heavy Traffic - Significant delays
+             </Text>
+           </View>
         </View>
-
-        {Platform.OS === 'web' && (
-          <View style={styles.webInfo}>
-            <Text style={styles.webInfoTitle}>Web Version Limitations:</Text>
-            <Text style={styles.webInfoText}>• No real-time map display</Text>
-            <Text style={styles.webInfoText}>• No GPS location services</Text>
-            <Text style={styles.webInfoText}>• No traffic data visualization</Text>
-            <Text style={styles.webInfoText}>• Limited search functionality</Text>
-            <Text style={styles.webInfoText}>• No push notifications</Text>
-          </View>
-        )}
-      </View>
+      </TransparentCard>
     </ScrollView>
   );
 }
@@ -264,210 +334,141 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f8f8",
+    paddingBottom: 100,
+  },
+  header: {
+    margin: 20,
+    marginBottom: 24,
+    padding: 24,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  headerText: {
+    flex: 1,
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: "700",
+    marginBottom: 8,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    opacity: 0.8,
   },
   section: {
-    backgroundColor: "white",
-    marginVertical: 10,
-    marginHorizontal: 15,
-    borderRadius: 10,
-    padding: 15,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    marginHorizontal: 20,
+    marginBottom: 20,
+    padding: 24,
+  },
+  sectionHeader: {
+    marginBottom: 20,
+  },
+  sectionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  sectionIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.glass.medium,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sectionText: {
+    flex: 1,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 20,
+    fontWeight: "600",
     marginBottom: 8,
-    color: "#333",
   },
   sectionDescription: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 15,
-    lineHeight: 18,
+    fontSize: 15,
+    lineHeight: 22,
+    opacity: 0.8,
+  },
+  settingItems: {
+    marginTop: 8,
   },
   settingItem: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 12,
+    paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
   },
   settingContent: {
     flex: 1,
-    marginRight: 15,
+    marginRight: 20,
   },
   settingLabel: {
-    fontSize: 16,
-    color: "#444",
-    marginBottom: 2,
+    fontSize: 17,
+    fontWeight: "500",
+    marginBottom: 4,
   },
   settingDescription: {
-    fontSize: 13,
-    color: "#666",
-    lineHeight: 16,
-  },
-  mapTypeContainer: {
-    flexDirection: "row",
-  },
-  mapTypeButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 4,
-    marginLeft: 8,
-    backgroundColor: "#f0f0f0",
-  },
-  mapTypeButtonActive: {
-    backgroundColor: "#2f95dc",
-  },
-  mapTypeButtonDisabled: {
-    backgroundColor: "#e0e0e0",
-    opacity: 0.6,
-  },
-  mapTypeText: {
-    fontSize: 14,
-    color: "#555",
-  },
-  mapTypeTextActive: {
-    color: "white",
-  },
-  mapTypeTextDisabled: {
-    color: "#999",
-  },
-  infoItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-  },
-  infoLabel: {
-    fontSize: 16,
-    color: "#444",
-  },
-  infoValue: {
-    fontSize: 16,
-    color: "#666",
-  },
-  linkItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-  },
-  linkLabel: {
-    fontSize: 16,
-    color: "#444",
-  },
-  webNotice: {
-    backgroundColor: "#fff3cd",
-    padding: 12,
-    borderRadius: 6,
-    marginTop: 10,
-    borderLeftWidth: 4,
-    borderLeftColor: "#ffc107",
-  },
-  webNoticeText: {
-    color: "#856404",
-    fontSize: 14,
-  },
-  aboutDescription: {
-    fontSize: 14,
-    color: "#666",
+    fontSize: 15,
     lineHeight: 20,
-    marginBottom: 15,
+    opacity: 0.7,
   },
-  aboutSubtitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 15,
-    marginBottom: 8,
-    color: "#333",
+  settingValue: {
+    fontSize: 17,
+    fontWeight: "500",
   },
-  featureList: {
-    marginBottom: 15,
+     mapTypeSection: {
+     marginTop: 24,
+     paddingTop: 20,
+     borderTopWidth: 1,
+   },
+  mapTypeLabel: {
+    fontSize: 17,
+    fontWeight: "500",
+    marginBottom: 16,
   },
-  featureItem: {
-    fontSize: 14,
-    color: "#555",
-    marginBottom: 4,
-  },
-  termsDate: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 8,
-  },
-  termsDescription: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 15,
-    lineHeight: 18,
-  },
-  termsSubtitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginTop: 15,
-    marginBottom: 8,
-    color: "#333",
-  },
-  termsText: {
-    fontSize: 14,
-    color: "#555",
-    marginBottom: 4,
-    lineHeight: 18,
-  },
+     mapTypeContainer: {
+     flexDirection: "row",
+     gap: 6,
+     justifyContent: "space-between",
+   },
+   mapTypeButton: {
+     flex: 1,
+     minWidth: 100,
+     paddingVertical: 12,
+     paddingHorizontal: 12,
+     borderRadius: 8,
+     borderWidth: 1,
+     alignItems: "center",
+     justifyContent: "center",
+     backgroundColor: colors.transparent.secondary,
+   },
+     mapTypeText: {
+     fontSize: 13,
+     fontWeight: "500",
+     textAlign: "center",
+     flexShrink: 1,
+   },
   trafficInfo: {
-    marginTop: 10,
+    marginTop: 20,
+    gap: 16,
   },
   trafficItem: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 8,
+    gap: 16,
   },
   trafficIndicator: {
-    width: 30,
-    height: 6,
-    borderRadius: 3,
-    marginRight: 10,
-  },
-  trafficGreen: {
-    backgroundColor: "#4CAF50",
-  },
-  trafficOrange: {
-    backgroundColor: "#FF9800",
-  },
-  trafficRed: {
-    backgroundColor: "#F44336",
+    width: 24,
+    height: 4,
+    borderRadius: 2,
   },
   trafficText: {
-    fontSize: 14,
-    color: "#555",
-  },
-  webInfo: {
-    backgroundColor: "#e3f2fd",
-    padding: 12,
-    borderRadius: 6,
-    marginTop: 15,
-    borderLeftWidth: 4,
-    borderLeftColor: "#2196f3",
-  },
-  webInfoTitle: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#1565c0",
-    marginBottom: 8,
-  },
-  webInfoText: {
-    fontSize: 13,
-    color: "#1976d2",
-    marginBottom: 4,
+    fontSize: 15,
+    flex: 1,
+    lineHeight: 20,
   },
 });

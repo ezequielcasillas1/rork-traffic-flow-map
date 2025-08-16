@@ -1,105 +1,81 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 
+// Configure notification behavior
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
+
 export function useNotifications() {
-  const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
-  const [notification, setNotification] = useState<Notifications.Notification | null>(null);
-  const notificationListener = useRef<any>();
-  const responseListener = useRef<any>();
+  const [expoPushToken, setExpoPushToken] = useState<string | undefined>();
+  const [notification, setNotification] = useState<Notifications.Notification>();
+  const notificationListener = useRef<Notifications.Subscription>();
+  const responseListener = useRef<Notifications.Subscription>();
 
   useEffect(() => {
     registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
 
-    // This listener is fired whenever a notification is received while the app is foregrounded
     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
       setNotification(notification);
-      
-      // Handle traffic notifications when app is open
-      const data = notification.request.content.data;
-      if (data?.type) {
-        handleTrafficNotification(data);
-      }
     });
 
-    // This listener is fired whenever a user taps on or interacts with a notification
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      const data = response.notification.request.content.data;
-      if (data?.type) {
-        handleTrafficNotificationTap(data);
-      }
+      console.log('Notification response:', response);
     });
 
     return () => {
-      if (notificationListener.current) Notifications.removeNotificationSubscription(notificationListener.current);
-      if (responseListener.current) Notifications.removeNotificationSubscription(responseListener.current);
+      if (notificationListener.current) {
+        Notifications.removeNotificationSubscription(notificationListener.current);
+      }
+      if (responseListener.current) {
+        Notifications.removeNotificationSubscription(responseListener.current);
+      }
     };
   }, []);
 
-  // Handle traffic notifications when app is open
-  const handleTrafficNotification = (data: any) => {
-    console.log('Traffic notification received:', data);
-    
-    // You can add custom logic here like:
-    // - Playing specific sounds
-    // - Showing in-app alerts
-    // - Updating UI state
-    // - Triggering haptic feedback
-    
-    switch (data.type) {
-      case 'traffic':
-        console.log(`🚦 Traffic alert: ${data.locationName} - ${data.timeAway} away`);
-        break;
-      case 'road-closure':
-        console.log(`🚧 Road closure: ${data.locationName} - ${data.timeAway} away`);
-        break;
-      case 'accident':
-        console.log(`⚠️ Accident alert: ${data.locationName} - ${data.timeAway} away`);
-        break;
+  const sendTestNotification = async () => {
+    if (expoPushToken) {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Traffic Alert",
+          body: "Heavy traffic detected on your route",
+          data: { data: 'goes here' },
+        },
+        trigger: { seconds: 2 },
+      });
     }
   };
 
-  // Handle when user taps on traffic notification
-  const handleTrafficNotificationTap = (data: any) => {
-    console.log('User tapped traffic notification:', data);
-    
-    // You can add navigation logic here like:
-    // - Navigate to map with coordinates
-    // - Open traffic details screen
-    // - Show route alternatives
-    
-    if (data.coordinates) {
-      console.log(`Navigate to: ${data.coordinates.lat}, ${data.coordinates.lng}`);
-      // Example: router.push(`/map?lat=${data.coordinates.lat}&lng=${data.coordinates.lng}`);
-    }
+  const sendCustomNotification = async (title: string, body: string, data?: any) => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title,
+        body,
+        data: data || {},
+      },
+      trigger: { seconds: 1 },
+    });
   };
 
-  return { expoPushToken, notification };
+  return {
+    expoPushToken,
+    notification,
+    sendTestNotification,
+    sendCustomNotification,
+  };
 }
 
-// Helper function to register for push notifications
 async function registerForPushNotificationsAsync() {
   let token;
-  if (Device.isDevice) {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    if (finalStatus !== 'granted') {
-      alert('Failed to get push token for push notification!');
-      return null;
-    }
-    token = (await Notifications.getExpoPushTokenAsync()).data;
-  } else {
-    alert('Must use physical device for Push Notifications');
-    return null;
-  }
 
   if (Platform.OS === 'android') {
-    Notifications.setNotificationChannelAsync('default', {
+    await Notifications.setNotificationChannelAsync('default', {
       name: 'default',
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
@@ -107,5 +83,26 @@ async function registerForPushNotificationsAsync() {
     });
   }
 
+  if (Device.isDevice) {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    
+    if (finalStatus !== 'granted') {
+      console.log('Failed to get push token for push notification!');
+      return;
+    }
+    
+    token = (await Notifications.getExpoPushTokenAsync({
+      projectId: 'b40a5dce-6ee6-4fde-b20f-b725c944a52b', // From your app.json
+    })).data;
+  } else {
+    console.log('Must use physical device for Push Notifications');
+  }
+
   return token;
-} 
+}
